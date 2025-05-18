@@ -20,9 +20,22 @@ RUN apt-get update && apt-get install -y \
   libxcomposite1 \
   libxdamage1 \
   libxrandr2 \
+  libxss1 \
+  libxshmfence1 \
+  libgbm1 \
   libdrm2 \
+  libxext6 \
+  libxfixes3 \
+  libgl1 \
+  libglu1-mesa \
+  libpangocairo-1.0-0 \
+  libpango-1.0-0 \
+  libjpeg-dev \
+  libx11-dev \
+  libxtst6 \
   xdg-utils \
-  --no-install-recommends
+  --no-install-recommends \
+  && rm -rf /var/lib/apt/lists/*
 
 # Set direktori kerja
 WORKDIR /app
