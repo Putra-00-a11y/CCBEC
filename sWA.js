@@ -3,7 +3,7 @@ console.clear();
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const readline = require('readline-sync');
-import chalk from 'chalk';
+const chalk = require('chalk');
 const figlet = require('figlet');
 
 // ⚡ ANIMASI KETIKAN
