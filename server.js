@@ -6,6 +6,7 @@ const expressWs = require('express-ws');
 const path = require('path');
 const fs = require('fs');
 const pty = require('node-pty');
+const shell = process.env.SHELL || 'bash';
 
 app.use(cors())
 expressWs(app);
@@ -16,7 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 const allowedCommands = ['nmap', 'npm', 'ssh', 'php', 'python', 'bash', 'sudo', 'screenfetch', 'crontab', 'uname', 'w', 'find', 'history', 'du', 'lsof', 'netstat', 'node', 'touch', 'hostname', 'df', 'ps', 'free', 'hollywood', 'mkdir', 'ls', 'l', 'ping', 'echo', 'date', 'uptime', 'curl', 'whoami', 'cat', 'ssh', 'clear', 'nano'];
 
 app.ws('/terminal', (ws) => {
-  const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash';
   const ptyProcess = pty.spawn(shell, [], {
     name: 'xterm-color',
     cols: 100,
