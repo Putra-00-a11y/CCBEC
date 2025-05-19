@@ -6,6 +6,7 @@ const readline = require('readline-sync');
 const chalk = require('chalk');
 const figlet = require('figlet');
 const WebSocket = require('ws');
+const app = express();
 
 const PORT = process.env.PORT || 3001;
 
