@@ -9,7 +9,7 @@ const WebSocket = require('ws');
 const express = require('express');
 const app = express();
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // 🧠 WebSocket server buat kirim QR ke frontend
 const wss = new WebSocket.Server({ port: PORT });
