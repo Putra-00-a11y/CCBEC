@@ -102,7 +102,7 @@ function typeEffect(text, delay = 30) {
         console.log(chalk.red(`[!] Terputus dari WhatsApp: ${reason}`));
     });
 
-    app.listen(PORT, () => {
+    app.listen(3001, () => {
     console.log(`Server running on port ${PORT}`);
     });
 
