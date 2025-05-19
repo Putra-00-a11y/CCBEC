@@ -14,7 +14,8 @@ const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
 // 🧠 WebSocket server gabung dengan Express server
-const wss = new WebSocket.Server({ server });
+const WS_PORT = 3002;
+const wss = new WebSocket.Server({ port: WS_PORT });
 
 let wsClient = null;
 
@@ -116,7 +117,7 @@ function typeEffect(text, delay = 30) {
     });
 
     // 🟢 Mulai server dan WA client
-    server.listen(PORT, () => {
+    server.listen(3001, () => {
         console.log(chalk.green(`[🌐] Server aktif di port ${PORT}`));
     });
 
