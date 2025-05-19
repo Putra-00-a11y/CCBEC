@@ -18,6 +18,11 @@ let wsClient = null;
 wss.on('connection', (ws) => {
     console.log(chalk.yellow('[WS] Frontend terhubung!'));
     wsClient = ws;
+
+    ws.on('close', () => {
+        console.log(chalk.red('[WS] Frontend terputus!'));
+        wsClient = null;
+    })
 });
 
 function typeEffect(text, delay = 30) {
