@@ -1,12 +1,23 @@
 console.clear();
 
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
+const qrcode = require('qrcode');
 const readline = require('readline-sync');
 const chalk = require('chalk');
 const figlet = require('figlet');
+const WebSocket = require('ws');
 
-// ⚡ ANIMASI KETIKAN
+const PORT = process.env.PORT || 3001;
+
+// 🧠 WebSocket server buat kirim QR ke frontend
+const wss = new WebSocket.Server({ port: PORT });
+let wsClient = null;
+
+wss.on('connection', (ws) => {
+    console.log(chalk.yellow('[WS] Frontend terhubung!'));
+    wsClient = ws;
+});
+
 function typeEffect(text, delay = 30) {
     return new Promise(resolve => {
         let i = 0;
@@ -22,7 +33,6 @@ function typeEffect(text, delay = 30) {
     });
 }
 
-// 🚀 MAIN EXEC
 (async () => {
     console.log(chalk.cyan(figlet.textSync('V-Tools', { horizontalLayout: 'fitted' })));
     console.log(chalk.gray("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
@@ -36,7 +46,7 @@ function typeEffect(text, delay = 30) {
 
     const client = new Client({
         authStrategy: new LocalAuth({
-            clientId: 'VToolsSession' // 👉 Session tetap pakai ID ini
+            clientId: 'VToolsSession'
         }),
         puppeteer: {
             headless: true,
@@ -44,14 +54,22 @@ function typeEffect(text, delay = 30) {
         }
     });
 
-    // Saat muncul QR
-    client.on('qr', qr => {
-        console.clear(); // Biar layar bersih
-        console.log(chalk.yellow("\n[!] Silakan scan QR berikut untuk login sekali:\n"));
-        qrcode.generate(qr, { small: false }); // small: false = QR besar, tapi hati-hati kepotong
+    // 🟡 Saat QR muncul
+    client.on('qr', async (qr) => {
+        const qrDataUrl = await qrcode.toDataURL(qr);
+        console.log(chalk.yellow('\n[!] QR Code dibuat, mengirim ke frontend...\n'));
+
+        if (wsClient && wsClient.readyState === WebSocket.OPEN) {
+            wsClient.send(JSON.stringify({
+                type: 'qr',
+                data: qrDataUrl
+            }));
+        } else {
+            console.log(chalk.red('[X] Tidak ada frontend terhubung via WebSocket!'));
+        }
     });
 
-    // ✅ Berhasil login
+    // ✅ Login sukses
     client.on('ready', async () => {
         console.log(chalk.green("\n[✓] Berhasil login ke WhatsApp!\n"));
 
@@ -71,15 +89,19 @@ function typeEffect(text, delay = 30) {
         process.exit(0);
     });
 
-    // ❌ Kalau gagal auth
+    // ❌ Gagal login
     client.on('auth_failure', msg => {
         console.error(chalk.red(`[!] Gagal otentikasi: ${msg}`));
         console.log(chalk.red('[!] Coba hapus folder .wwebjs_auth atau pastikan tidak corrupt.'));
     });
 
-    // ℹ Info saat disconnect
+    // 🔴 Disconnect
     client.on('disconnected', reason => {
         console.log(chalk.red(`[!] Terputus dari WhatsApp: ${reason}`));
+    });
+
+    app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
     });
 
     client.initialize();
