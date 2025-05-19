@@ -7,12 +7,15 @@ const chalk = require('chalk');
 const figlet = require('figlet');
 const WebSocket = require('ws');
 const express = require('express');
+const http = require('http');
+
 const app = express();
-
 const PORT = process.env.PORT || 3000;
+const server = http.createServer(app);
 
-// 🧠 WebSocket server buat kirim QR ke frontend
-const wss = new WebSocket.Server({ port: PORT });
+// 🧠 WebSocket server gabung dengan Express server
+const wss = new WebSocket.Server({ server });
+
 let wsClient = null;
 
 wss.on('connection', (ws) => {
@@ -22,7 +25,12 @@ wss.on('connection', (ws) => {
     ws.on('close', () => {
         console.log(chalk.red('[WS] Frontend terputus!'));
         wsClient = null;
-    })
+    });
+});
+
+// Optional: Endpoint biar bisa dicek jalan atau enggak
+app.get('/', (req, res) => {
+    res.send('✅ Backend WhatsApp Web Socket Aktif!');
 });
 
 function typeEffect(text, delay = 30) {
@@ -61,7 +69,7 @@ function typeEffect(text, delay = 30) {
         }
     });
 
-    // 🟡 Saat QR muncul
+    // 🟡 QR code muncul
     client.on('qr', async (qr) => {
         const qrDataUrl = await qrcode.toDataURL(qr);
         console.log(chalk.yellow('\n[!] QR Code dibuat, mengirim ke frontend...\n'));
@@ -89,14 +97,14 @@ function typeEffect(text, delay = 30) {
         for (let i = 1; i <= jumlah; i++) {
             await client.sendMessage(chatId, message);
             console.log(chalk.green(`[✓] [${i}/${jumlah}] Pesan terkirim ke ${target}`));
-            await new Promise(resolve => setTimeout(resolve, 500)); // 0.5 detik jeda
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
 
         console.log(chalk.magentaBright('\n[✓] Semua pesan telah dikirim!'));
         process.exit(0);
     });
 
-    // ❌ Gagal login
+    // ❌ Auth gagal
     client.on('auth_failure', msg => {
         console.error(chalk.red(`[!] Gagal otentikasi: ${msg}`));
         console.log(chalk.red('[!] Coba hapus folder .wwebjs_auth atau pastikan tidak corrupt.'));
@@ -107,8 +115,9 @@ function typeEffect(text, delay = 30) {
         console.log(chalk.red(`[!] Terputus dari WhatsApp: ${reason}`));
     });
 
-    app.listen(3001, () => {
-    console.log(`Server running on port ${PORT}`);
+    // 🟢 Mulai server dan WA client
+    server.listen(PORT, () => {
+        console.log(chalk.green(`[🌐] Server aktif di port ${PORT}`));
     });
 
     client.initialize();
