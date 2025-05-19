@@ -40,14 +40,15 @@ function typeEffect(text, delay = 30) {
         }),
         puppeteer: {
             headless: true,
-            args: ['--no-sandbox']
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         }
     });
 
-    // ⏳ Saat muncul QR
+    // Saat muncul QR
     client.on('qr', qr => {
-        console.log(chalk.yellow("\n[!] Silakan scan QR berikut untuk login sekali:"));
-        qrcode.generate(qr, { small: true });
+        console.clear(); // Biar layar bersih
+        console.log(chalk.yellow("\n[!] Silakan scan QR berikut untuk login sekali:\n"));
+        qrcode.generate(qr, { small: false }); // small: false = QR besar, tapi hati-hati kepotong
     });
 
     // ✅ Berhasil login
